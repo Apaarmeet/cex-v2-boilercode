@@ -1,0 +1,39 @@
+name: Centrailized-exchange
+
+services:
+  postgres:
+    image: postgres
+    container_name: cex
+    environment:
+      POSTGRES_DB: cex
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - Centrailized-exchange_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: Centrailized-exchange-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - Centrailized-exchange_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  Centrailized-exchange_postgres_data:
+  Centrailized-exchange_redis_data:
